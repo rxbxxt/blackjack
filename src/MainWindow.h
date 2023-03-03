@@ -2,21 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <sstream>
-#include "ui_MainWindow.h"
+#include <QPushButton>
+#include <QHBoxLayout>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
+#include <memory>
 
 
-#define MENU_WIDGET_NAME "menuWidget"
 #define GAME_NAME        "Blackjack"
-
 #define RESOLUTION_X     1200
 #define RESOLUTION_Y     675
-
-#define BACKGROUND_TEXTURE "images/menu_background.png"
 
 
 class MainWindow : public QMainWindow {
@@ -24,14 +18,20 @@ class MainWindow : public QMainWindow {
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
-private slots:
 
 private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<QWidget>     _central_widget;
+    std::unique_ptr<QHBoxLayout> _layout_buttons;
+    std::unique_ptr<QPushButton> _button_play;
+    std::unique_ptr<QPushButton> _button_quit;
 
-    void __setBackgroundImage();
+
+    void initLayout();
+    void initCentralWidget();
+    void initButtons();
+    void initButton(std::unique_ptr<QPushButton> &button,
+                    const char *object_name,
+                    const char *button_text);
 };
 
 #endif // MAINWINDOW_H

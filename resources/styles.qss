@@ -1,0 +1,8 @@
+QMainWindow {
+    background-image: url(:/images/menu_background.png);
+}
+
+QPushButton#button_play {
+    background-color: red;
+    border: none;
+}

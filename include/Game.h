@@ -15,13 +15,11 @@
 
 #define BUTTON_PLAY_POSITION 475 
 #define BUTTON_QUIT_POSITION 550 
+#define BUTTON_MENU_POSITION 600 
 
 
 class Game: public QGraphicsView {
     Q_OBJECT
-
-public slots:
-    void play();
 
 public:
     Game(QWidget *parent = nullptr);
@@ -31,13 +29,24 @@ private:
 
     QPointer <Button> _button_play;
     QPointer <Button> _button_quit;
+    QPointer <Button> _button_menu;
 
-    void initMenu();
-    void initScene();
-    void initButtons();
+    void addMenuSceneItems();
+    void addPlaySceneItems();
+
+    void initMenuScene();
+    void initMenuSceneButtons();
+    void initPlayScene();
+    void initPlaySceneButtons();
+
+
     void initButton(QPointer<Button> &button,
                     const char *button_text,
                     const int button_height);
+
+private slots:
+    void play();
+    void menu();
 };
 
 #endif // GAME_H 

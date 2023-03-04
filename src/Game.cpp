@@ -5,35 +5,55 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFixedSize(RESOLUTION_X, RESOLUTION_Y);
     setWindowTitle(GAME_NAME);
-    initMenu();
+
+    _scene = new QGraphicsScene();
+    setScene(_scene.get());
+    initMenuScene();
 }
 
 void Game::play() {
+    initPlayScene();
+}
+
+void Game::menu() {
+    initMenuScene();
+}
+
+void Game::initMenuScene() {
+    initMenuSceneButtons();
+    addMenuSceneItems();
+}
+
+void Game::addMenuSceneItems() {
     _scene->clear();
-
-    setStyleSheet("background-image: url(:/background/game);");
-}
-
-void Game::initMenu() {
-    initButtons();
-    initScene();
-    setStyleSheet("background-image: url(:/background/menu);");
-}
-
-void Game::initScene() {
-    _scene = new QGraphicsScene();
-    setScene(_scene.get());
-
     _scene->addItem(_button_quit.get());
     _scene->addItem(_button_play.get());
     _scene->setSceneRect(0, 0, RESOLUTION_X, RESOLUTION_Y);
+    setStyleSheet("background-image: url(:/background/menu);");
 }
 
-void Game::initButtons() {
+void Game::initMenuSceneButtons() {
     initButton(_button_play, "Play", BUTTON_PLAY_POSITION);
     initButton(_button_quit, "Quit", BUTTON_QUIT_POSITION);
     connect(_button_play.get(), SIGNAL(clicked()), this, SLOT(play()));
     connect(_button_quit.get(), SIGNAL(clicked()), this, SLOT(close()));
+}
+
+void Game::initPlayScene() {
+    initPlaySceneButtons();
+    addPlaySceneItems();
+}
+
+void Game::addPlaySceneItems() {
+    _scene->clear();
+    _scene->addItem(_button_menu.get());
+    _scene->setSceneRect(0, 0, RESOLUTION_X, RESOLUTION_Y);
+    setStyleSheet("background-image: url(:/background/game);");
+}
+
+void Game::initPlaySceneButtons() {
+    initButton(_button_menu, "Menu", BUTTON_MENU_POSITION);
+    connect(_button_menu.get(), SIGNAL(clicked()), this, SLOT(menu()));
 }
 
 void Game::initButton(QPointer<Button> &button,

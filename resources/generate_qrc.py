@@ -17,6 +17,8 @@ if __name__ == '__main__':
 
         resources.write('  <qresource prefix="/card">\n')
         for suit in os.listdir(CARDS_DIR):
+            if suit == 'unknown.png':
+                continue
             resources.write(f'    <!-- {suit} -->\n')
             for card in os.listdir(f'{CARDS_DIR}/{suit}'):
                 alias = os.path.splitext(f'{suit}/{card}')[0] # filename without extension

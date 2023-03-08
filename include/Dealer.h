@@ -15,14 +15,18 @@ public:
     Dealer(); 
     ~Dealer(); 
 
-    QPixmap *getRandomCard();
+    QPixmap *getCard();
 
 private:
+    std::vector <QPixmap*>  _deck;
     std::vector <QPixmap*>  _cards;
     std::vector <uint8_t>   _values;
 
+    void loadDeck();
     void loadCards();
     void loadCardsHelper(const char *cardfile, int cardnum);
+
+    QPixmap *getUnknownCard() { return _cards.front(); }
 };
 
 #endif // DEALER_H

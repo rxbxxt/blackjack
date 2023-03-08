@@ -7,7 +7,7 @@
 #include <QPointer>
 #include <memory>
 
-#include "GameManager.h"
+#include "GameSceneManager.h"
 #include "Button.h"
 
 #define GAME_NAME        "Blackjack"
@@ -28,8 +28,8 @@ public:
     Game(QWidget *parent = nullptr);
 
 private:
-    std::unique_ptr <GameManager>  _game_manager;
-    QPointer <QGraphicsScene>      _scene;
+    std::unique_ptr <GameSceneManager>  _game_scene_manager;
+    QPointer <QGraphicsScene>           _scene;
 
     QPointer <Button> _button_play;
     QPointer <Button> _button_quit;

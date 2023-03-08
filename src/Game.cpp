@@ -10,9 +10,10 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     setWindowTitle(GAME_NAME);
 
     _scene = new QGraphicsScene();
-    _game_manager = std::make_unique <GameManager>(_scene);
-
+    _scene->setSceneRect(0, 0, RESOLUTION_X, RESOLUTION_Y);
     setScene(_scene.get());
+
+    _game_scene_manager = nullptr;
     initMenuScene();
 }
 
@@ -22,10 +23,12 @@ void Game::initMenuScene() {
 }
 
 void Game::addMenuSceneItems() {
+    if (_game_scene_manager != nullptr) {
+        _game_scene_manager->clearDealScene();
+    }
     _scene->clear();
     _scene->addItem(_button_quit.get());
     _scene->addItem(_button_play.get());
-    _scene->setSceneRect(0, 0, RESOLUTION_X, RESOLUTION_Y);
     setStyleSheet("background-image: url(:/background/menu);");
 }
 
@@ -43,12 +46,14 @@ void Game::initPlayScene() {
 
 void Game::addPlaySceneItems() {
     _scene->clear();
-    _scene->setSceneRect(0, 0, RESOLUTION_X, RESOLUTION_Y);
-    setStyleSheet("background-image: url(:/background/game);");
 
-    _game_manager->printRandomCard();
+    if (_game_scene_manager == nullptr) {
+        _game_scene_manager = std::make_unique <GameSceneManager>(_scene, RESOLUTION_X, RESOLUTION_Y);
+    }
+    _game_scene_manager->start();
 
     _scene->addItem(_button_menu.get());
+    setStyleSheet("background-image: url(:/background/game);");
 }
 
 void Game::initPlaySceneButtons() {

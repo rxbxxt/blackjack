@@ -10,12 +10,16 @@ Chip::Chip(int value, QGraphicsItem *parent) : QGraphicsEllipseItem(parent) {
     setAcceptHoverEvents(true);
 }
 
+Chip::~Chip() {
+    delete _text;
+}
+
 void Chip::initColor() {
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
 
     switch (_value) {
-    case 1:   _color = Qt::white;       break;
+    case 1:   _color = Qt::gray;        break;
     case 5:   _color = Qt::darkRed;     break;
     case 25:  _color = Qt::darkGreen;   break;
     case 50:  _color = Qt::darkBlue;    break;

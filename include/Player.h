@@ -8,6 +8,9 @@ class Player {
 public:
     Player();
 
+    const int &getBalance() const { return _balance; }
+    void setBalance(int balance) { _balance = balance; }
+
 private:
     int _balance;
     int _hand_score;

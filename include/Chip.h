@@ -21,6 +21,7 @@ signals:
 
 public:
     Chip(int value, QGraphicsItem *parent = nullptr);
+    ~Chip();
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

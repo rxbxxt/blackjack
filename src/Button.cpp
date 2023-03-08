@@ -2,14 +2,15 @@
 
 Button::Button(const char *name, QGraphicsItem *parent) : QGraphicsRectItem(parent) {
     setRect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT);
-    initColor();
+    initColor(Qt::white);
     initText(name);
+    setAcceptHoverEvents(true);
 }
 
-void Button::initColor() {
+void Button::initColor(Qt::GlobalColor color) {
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
-    brush.setColor(Qt::yellow);
+    brush.setColor(color);
     setBrush(brush);
 }
 
@@ -21,5 +22,16 @@ void Button::initText(const char *button_text) {
 }
 
 void Button::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    setCursor(QCursor(Qt::ArrowCursor));
     emit clicked();
+}
+
+void Button::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    initColor(Qt::yellow);
+    setCursor(QCursor(Qt::PointingHandCursor));
+}
+
+void Button::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    initColor(Qt::white);
+    setCursor(QCursor(Qt::ArrowCursor));
 }

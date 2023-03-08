@@ -5,9 +5,10 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QPointer>
+#include <memory>
 
+#include "GameSceneManager.h"
 #include "Button.h"
-
 
 #define GAME_NAME        "Blackjack"
 #define RESOLUTION_X     1200
@@ -17,15 +18,18 @@
 #define BUTTON_QUIT_POSITION 550 
 #define BUTTON_MENU_POSITION 600 
 
+#define RESOLUTION_X     1200
+#define RESOLUTION_Y     675
 
-class Game: public QGraphicsView {
+class Game : public QGraphicsView {
     Q_OBJECT
 
 public:
     Game(QWidget *parent = nullptr);
 
 private:
-    QPointer <QGraphicsScene> _scene;
+    std::unique_ptr <GameSceneManager>  _game_scene_manager;
+    QPointer <QGraphicsScene>           _scene;
 
     QPointer <Button> _button_play;
     QPointer <Button> _button_quit;

@@ -11,6 +11,7 @@
 #include <vector>
 #include <sstream>
 
+#include "IBlackjackPlayer.h"
 #include "Dealer.h"
 #include "Player.h"
 #include "Button.h"
@@ -22,9 +23,15 @@
 #define DEAL_TEXT_Y    100
 #define BETTED_TEXT_X  50
 #define BETTED_TEXT_Y  600
-#define BALANCE_TEXT_X 700
+#define BALANCE_TEXT_X 850
 #define BALANCE_TEXT_Y 600
 #define FONT_SIZE      32
+#define PLAYERCARD_Y   350
+#define DEALERCARD_Y   100
+#define CARD_X         350
+#define PLAYER_SCORE_Y 400
+#define DEALER_SCORE_Y 150
+#define SCORE_X        35
 
 class GameSceneManager : public QObject {
     Q_OBJECT
@@ -46,15 +53,20 @@ private:
     int                      _resolution_y;
     int                      _bet_sum;
 
-    std::unique_ptr <QFont>         _font;
-    QGraphicsTextItem    *_deal_text;
-    QGraphicsTextItem    *_balance_text;
+    std::unique_ptr <QFont>  _font;
+    QGraphicsTextItem       *_deal_text;
+    QGraphicsTextItem       *_balance_text;
+    QGraphicsTextItem       *_playerscore_text;
+    QGraphicsTextItem       *_dealerscore_text;
 
 
+    void removeDealItems();
     void addPlayerBalance();
     void addDealSceneItems();
     void initDealSceneButtons();
     void initDealSceneChips();
+
+    void initHitStandScene();
 
     void initButton(QPointer<Button> &button,
                     const char *button_text,
@@ -63,6 +75,14 @@ private:
     void setMessage(QGraphicsTextItem **textitem, 
                     const char *textmessage,
                     int x, int y);
+
+    void dealCards(int cardnum);
+    void dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
+                  IBlackjackPlayer &blackjack_player,
+                  int card_number,
+                  int card_position_y);
+
+    void drawCard(QPixmap *card, int x, int y);
 
 private slots:
     void deal();

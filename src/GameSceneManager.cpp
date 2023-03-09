@@ -4,19 +4,28 @@ GameSceneManager::~GameSceneManager() {
     delete _button_deal.data();
     delete _deal_text;
     delete _balance_text;
+    delete _playerscore_text;
+    delete _dealerscore_text;
 }
 
 void GameSceneManager::clearDealScene() {
+    removeDealItems();
+    _scene->removeItem(_balance_text);
+    delete _deal_text;
+    delete _balance_text;
+    delete _playerscore_text;
+    delete _dealerscore_text;
+    _deal_text = nullptr;
+    _balance_text = nullptr;
+    _playerscore_text = nullptr;
+    _dealerscore_text = nullptr;
+}
+
+void GameSceneManager::removeDealItems() {
     _scene->removeItem(_button_deal.get());
     for (auto &chip : _chips) {
         _scene->removeItem(chip);
     }
-    _scene->removeItem(_deal_text);
-    _scene->removeItem(_balance_text);
-    delete _deal_text;
-    delete _balance_text;
-    _deal_text = nullptr;
-    _balance_text = nullptr;
 }
 
 void GameSceneManager::deal() { 
@@ -29,6 +38,8 @@ void GameSceneManager::deal() {
     _deal_text->setPos(BETTED_TEXT_X, BETTED_TEXT_Y);
     _player->setBalance(_player->getBalance() - _bet_sum);
     addPlayerBalance();
+    removeDealItems();
+    initHitStandScene();
 }
 
 void GameSceneManager::bet(int sum) { 
@@ -45,23 +56,27 @@ void GameSceneManager::bet(int sum) {
 
 GameSceneManager::GameSceneManager(QGraphicsScene *scene, 
                                    int resolution_x, int resolution_y) {
-    _resolution_x = resolution_x;
-    _resolution_y = resolution_y;
-    _dealer = std::make_unique<Dealer>();
-    _player = std::make_unique<Player>();
-    _font   = std::make_unique<QFont>();
-    _font->setPointSize(FONT_SIZE);
-    _scene = scene;
-    _button_deal = nullptr;
-    _deal_text = nullptr;
-    _balance_text = nullptr;
-    _bet_sum = 0;
+    _scene            = scene;
+    _bet_sum          = 0;
+    _button_deal      = nullptr;
+    _deal_text        = nullptr;
+    _balance_text     = nullptr;
+    _playerscore_text = nullptr;
+    _dealerscore_text = nullptr;
+    _resolution_x     = resolution_x;
+    _resolution_y     = resolution_y;
+    _dealer           = std::make_unique<Dealer>();
+    _player           = std::make_unique<Player>();
+    _font             = std::make_unique<QFont>();
+
     _chips.reserve(6);
+    _font->setPointSize(FONT_SIZE);
     initDealSceneButtons();
     initDealSceneChips();
 }
 
 void GameSceneManager::start() {
+    _bet_sum = 0;
     addDealSceneItems();
     addPlayerBalance(); 
 }
@@ -83,10 +98,12 @@ void GameSceneManager::initDealSceneChips() {
     for (int chip_value : {1, 5, 25, 50, 100, 500}) {
         auto chip = new Chip(chip_value);
         chip->setPos(FIRST_CHIP_X + x * CHIP_HOVER_DIAMETER, CHIPS_HEIGHT);
-        connect(chip, &Chip::clicked, this, [=](){ 
+        _chips.push_back(chip);
+
+        connect(_chips.back(), &Chip::clicked, this, [=](){
             emit bet(chip_value);
         });
-        _chips.push_back(chip);
+
         ++x;
     }
 }
@@ -117,4 +134,41 @@ void GameSceneManager::setMessage(QGraphicsTextItem **textitem,
     (*textitem)->setFont(*_font);
     (*textitem)->setDefaultTextColor(Qt::white);
     (*textitem)->setPos(x, y);
+}
+
+void GameSceneManager::initHitStandScene() {
+    for (int i = 0; i < 2; ++i) {
+        dealCards(i);
+    }
+}
+
+void GameSceneManager::dealCards(int cardnum) {
+    auto playerpair = _dealer->getCard();
+    dealCard(playerpair, *_player, cardnum, PLAYERCARD_Y);
+
+    auto dealerpair = _dealer->getCard();
+    dealCard(dealerpair, *_dealer, cardnum, DEALERCARD_Y);
+
+    std::stringstream score_text;
+    score_text << "Your score: " << _player->getHandScore();
+    setMessage(&_playerscore_text, score_text.str().c_str(), SCORE_X, PLAYER_SCORE_Y);
+
+    score_text.str("");
+    score_text << "Dealer score: " << _dealer->getHandScore();
+    setMessage(&_dealerscore_text, score_text.str().c_str(), SCORE_X, DEALER_SCORE_Y);
+}
+
+void GameSceneManager::dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
+                                IBlackjackPlayer &blackjack_player,
+                                int card_number,
+                                int card_position_y) {
+    auto card = card_to_value.first;
+    auto cardvalue = card_to_value.second;
+    drawCard(card, CARD_X + (card_number * card->width() / 2), card_position_y);
+    blackjack_player.setHandScore(blackjack_player.getHandScore() + cardvalue);
+}
+
+void GameSceneManager::drawCard(QPixmap *card, int x, int y) {
+    auto card_item = _scene->addPixmap(*card); 
+    card_item->setPos(x, y);
 }

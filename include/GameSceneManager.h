@@ -17,21 +17,24 @@
 #include "Button.h"
 #include "Chip.h"
 
-#define FIRST_CHIP_X   350
-#define CHIPS_HEIGHT   200
-#define DEAL_TEXT_X    475
-#define DEAL_TEXT_Y    100
-#define BETTED_TEXT_X  50
-#define BETTED_TEXT_Y  600
-#define BALANCE_TEXT_X 850
-#define BALANCE_TEXT_Y 600
-#define FONT_SIZE      32
-#define PLAYERCARD_Y   350
-#define DEALERCARD_Y   100
-#define CARD_X         350
-#define PLAYER_SCORE_Y 400
-#define DEALER_SCORE_Y 150
-#define SCORE_X        35
+#define FIRST_CHIP_X       350
+#define CHIPS_HEIGHT       200
+#define DEAL_TEXT_X        475
+#define DEAL_TEXT_Y        100
+#define BETTED_TEXT_X      50
+#define BETTED_TEXT_Y      600
+#define BALANCE_TEXT_X     850
+#define BALANCE_TEXT_Y     600
+#define FONT_SIZE          32
+#define PLAYERCARD_Y       350
+#define DEALERCARD_Y       100
+#define CARD_X             350
+#define PLAYER_SCORE_Y     400
+#define DEALER_SCORE_Y     150
+#define SCORE_X            35
+#define BUTTON_HIT_Y       325
+#define BUTTON_STAND_Y     250
+#define BUTTON_STAND_HIT_X 50
 
 class GameSceneManager : public QObject {
     Q_OBJECT
@@ -49,6 +52,8 @@ private:
     std::unique_ptr <Dealer> _dealer;
     std::unique_ptr <Player> _player;
     QPointer <Button>        _button_deal;
+    QPointer <Button>        _button_hit;
+    QPointer <Button>        _button_stand;
     int                      _resolution_x;
     int                      _resolution_y;
     int                      _bet_sum;
@@ -67,10 +72,12 @@ private:
     void initDealSceneChips();
 
     void initHitStandScene();
+    void initHitStandSceneButtons();
+    void addHitStandSceneItems();
 
     void initButton(QPointer<Button> &button,
                     const char *button_text,
-                    const int button_height);
+                    int button_y, int button_x = -1);
 
     void setMessage(QGraphicsTextItem **textitem, 
                     const char *textmessage,
@@ -87,6 +94,8 @@ private:
 private slots:
     void deal();
     void bet(int sum);
+    void stand();
+    void hit();
 };
 
 #endif // GAMEMANAGER_H

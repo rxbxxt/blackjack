@@ -2,6 +2,8 @@
 
 GameSceneManager::~GameSceneManager() {
     delete _button_deal.data();
+    delete _button_hit.data();
+    delete _button_stand.data();
     delete _deal_text;
     delete _balance_text;
     delete _playerscore_text;
@@ -72,6 +74,7 @@ GameSceneManager::GameSceneManager(QGraphicsScene *scene,
     _chips.reserve(6);
     _font->setPointSize(FONT_SIZE);
     initDealSceneButtons();
+    initHitStandSceneButtons();
     initDealSceneChips();
 }
 
@@ -109,11 +112,13 @@ void GameSceneManager::initDealSceneChips() {
 }
 
 void GameSceneManager::initButton(QPointer<Button> &button,
-                                  const char *button_text,
-                                  const int button_height) {
+                    const char *button_text,
+                    int button_y, int button_x) {
     button = new Button(button_text);
-    int button_width = _resolution_x / 2.0f - button->boundingRect().width() / 2.0f;
-    button->setPos(button_width, button_height);
+    if (button_x == -1) {
+        button_x = _resolution_x / 2.0f - button->boundingRect().width() / 2.0f;
+    }
+    button->setPos(button_x, button_y);
 }
 
 void GameSceneManager::addPlayerBalance() {
@@ -140,6 +145,7 @@ void GameSceneManager::initHitStandScene() {
     for (int i = 0; i < 2; ++i) {
         dealCards(i);
     }
+    addHitStandSceneItems();
 }
 
 void GameSceneManager::dealCards(int cardnum) {
@@ -171,4 +177,22 @@ void GameSceneManager::dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
 void GameSceneManager::drawCard(QPixmap *card, int x, int y) {
     auto card_item = _scene->addPixmap(*card); 
     card_item->setPos(x, y);
+}
+
+void GameSceneManager::initHitStandSceneButtons() {
+    initButton(_button_hit, "Hit", BUTTON_HIT_Y, BUTTON_STAND_HIT_X);
+    initButton(_button_stand, "Stand", BUTTON_STAND_Y, BUTTON_STAND_HIT_X);
+    connect(_button_hit.get(), SIGNAL(clicked()), this, SLOT(hit()));
+    connect(_button_stand.get(), SIGNAL(clicked()), this, SLOT(stand()));
+}
+
+void GameSceneManager::addHitStandSceneItems() {
+    _scene->addItem(_button_hit.get());
+    _scene->addItem(_button_stand.get());
+}
+
+void GameSceneManager::stand() {
+}
+
+void GameSceneManager::hit() {
 }

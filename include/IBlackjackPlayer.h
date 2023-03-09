@@ -5,9 +5,7 @@ class IBlackjackPlayer {
 public:
     virtual int getHandScore() = 0;
     virtual void setHandScore(int score) = 0;
-    virtual ~IBlackjackPlayer() {}
+    virtual ~IBlackjackPlayer() = default;
 };
-
-//IBlackjackPlayer::~IBlackjackPlayer() {};
 
 #endif // IBLACKJACKPLAYER_H 

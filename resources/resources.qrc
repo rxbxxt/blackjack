@@ -64,4 +64,8 @@
     <!-- unknown -->
     <file alias="unknown">./images/cards/unknown.png</file>
   </qresource>
+
+  <qresource prefix="/sound">
+    <file alias="click">./sound/click.wav</file>
+  </qresource>
 </RCC>

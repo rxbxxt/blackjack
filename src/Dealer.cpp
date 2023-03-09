@@ -1,20 +1,16 @@
 #include "Dealer.h"
-#include <iostream>
-#include <sstream>
-#include <random>
-#include <algorithm>
 
 Dealer::Dealer() {
-    _cards.reserve(53);
-    _values.reserve(53);
+    _hand_score = 0;
+    _cards_to_values.reserve(53);
     _deck.reserve(52);
     loadCards();
     loadDeck();
 }
 
 Dealer::~Dealer() {
-    for (auto &card : _cards) {
-        delete card;
+    for (auto &card : _cards_to_values) {
+        delete card.first;
     }
 }
 
@@ -32,18 +28,20 @@ void Dealer::loadCards() {
 
 void Dealer::loadCardsHelper(const char *cardfile, int cardnum) {
     auto card = new QPixmap(QPixmap(cardfile).scaled(CARD_WIDTH, CARD_HEIGHT));
-    _cards.push_back(card);
+    int value = 0;
 
-    if       (cardnum <= 10) { _values.push_back(cardnum); } // { 2, 3, .. 10 } & { 0 }
-    else if  (cardnum < 14)  { _values.push_back(10); }      // { J, Q, K }
-    else                     { _values.push_back(11); }      // { A }
+    if       (cardnum <= 10) { value = cardnum; } // { 2, 3, .. 10 } & { 0 }
+    else if  (cardnum < 14)  { value = 10; }      // { J, Q, K }
+    else                     { value = 11; }      // { A }
+
+    _cards_to_values.push_back(std::make_pair(card, value));
 }
 
 void Dealer::loadDeck() {
     _deck.clear();
 
     for (int i = 0; i < _deck.capacity(); ++i) {
-        _deck.push_back(_cards[i+1]); // skip unknown card
+        _deck.push_back(_cards_to_values[i+1]); // skip unknown card
     }
 
     auto rd = std::random_device {}; 
@@ -52,8 +50,19 @@ void Dealer::loadDeck() {
     std::shuffle(_deck.begin(), _deck.end(), rng);
 }
 
-QPixmap *Dealer::getCard() {
+const std::pair<QPixmap*, uint8_t> &Dealer::getCard() {
+    if (_deck.size() == _deck.capacity() / 2) {
+        loadDeck();
+    }
     auto card = _deck.back();
     _deck.pop_back();
     return card;
+}
+
+void Dealer::setHandScore(int score) {
+    _hand_score = score;
+}
+
+int  Dealer::getHandScore() {
+    return _hand_score;
 }

@@ -143,17 +143,17 @@ void GameSceneManager::setMessage(QGraphicsTextItem **textitem,
 
 void GameSceneManager::initHitStandScene() {
     for (int i = 0; i < 2; ++i) {
-        dealCards(i);
+        dealCards();
     }
     addHitStandSceneItems();
 }
 
-void GameSceneManager::dealCards(int cardnum) {
+void GameSceneManager::dealCards() {
     auto playerpair = _dealer->getCard();
-    dealCard(playerpair, *_player, cardnum, PLAYERCARD_Y);
+    dealCard(playerpair, *_player, PLAYERCARD_Y);
 
     auto dealerpair = _dealer->getCard();
-    dealCard(dealerpair, *_dealer, cardnum, DEALERCARD_Y);
+    dealCard(dealerpair, *_dealer, DEALERCARD_Y);
 
     std::stringstream score_text;
     score_text << "Your score: " << _player->getHandScore();
@@ -165,13 +165,14 @@ void GameSceneManager::dealCards(int cardnum) {
 }
 
 void GameSceneManager::dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
-                                IBlackjackPlayer &blackjack_player,
-                                int card_number,
+                                BlackjackPlayer &blackjack_player,
                                 int card_position_y) {
     auto card = card_to_value.first;
     auto cardvalue = card_to_value.second;
-    drawCard(card, CARD_X + (card_number * card->width() / 2), card_position_y);
+    auto cards_count = blackjack_player.getHandCardsCount();
+    drawCard(card, CARD_X + (cards_count * card->width() / 2), card_position_y);
     blackjack_player.setHandScore(blackjack_player.getHandScore() + cardvalue);
+    blackjack_player.setHandCardsCount(cards_count + 1);
 }
 
 void GameSceneManager::drawCard(QPixmap *card, int x, int y) {

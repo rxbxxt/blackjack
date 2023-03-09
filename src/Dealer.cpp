@@ -1,7 +1,6 @@
 #include "Dealer.h"
 
 Dealer::Dealer() {
-    _hand_score = 0;
     _cards_to_values.reserve(53);
     _deck.reserve(52);
     loadCards();
@@ -57,12 +56,4 @@ const std::pair<QPixmap*, uint8_t> &Dealer::getCard() {
     auto card = _deck.back();
     _deck.pop_back();
     return card;
-}
-
-void Dealer::setHandScore(int score) {
-    _hand_score = score;
-}
-
-int  Dealer::getHandScore() {
-    return _hand_score;
 }

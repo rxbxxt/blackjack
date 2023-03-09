@@ -11,7 +11,7 @@
 #include <vector>
 #include <sstream>
 
-#include "IBlackjackPlayer.h"
+#include "BlackjackPlayer.h"
 #include "Dealer.h"
 #include "Player.h"
 #include "Button.h"
@@ -34,7 +34,7 @@
 #define SCORE_X            35
 #define BUTTON_HIT_Y       325
 #define BUTTON_STAND_Y     250
-#define BUTTON_STAND_HIT_X 50
+#define BUTTON_STAND_HIT_X 75
 
 class GameSceneManager : public QObject {
     Q_OBJECT
@@ -83,10 +83,9 @@ private:
                     const char *textmessage,
                     int x, int y);
 
-    void dealCards(int cardnum);
+    void dealCards();
     void dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
-                  IBlackjackPlayer &blackjack_player,
-                  int card_number,
+                  BlackjackPlayer &blackjack_player,
                   int card_position_y);
 
     void drawCard(QPixmap *card, int x, int y);

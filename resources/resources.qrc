@@ -66,6 +66,7 @@
   </qresource>
 
   <qresource prefix="/sound">
+    <file alias="chip">./sound/chip.mp3</file>
     <file alias="click">./sound/click.wav</file>
   </qresource>
 </RCC>

@@ -23,6 +23,7 @@ void Button::initText(const char *button_text) {
 
 void Button::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     setCursor(QCursor(Qt::ArrowCursor));
+    Sound::playClick();
     emit clicked();
 }
 

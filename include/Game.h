@@ -35,6 +35,8 @@ private:
     QPointer <Button> _button_quit;
     QPointer <Button> _button_menu;
 
+    Sound sound;
+
     void addMenuSceneItems();
     void addPlaySceneItems();
 

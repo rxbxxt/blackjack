@@ -46,6 +46,7 @@ void Chip::initText() {
 
 void Chip::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     setCursor(QCursor(Qt::ArrowCursor));
+    Sound::playChip();
     emit clicked();
 }
 

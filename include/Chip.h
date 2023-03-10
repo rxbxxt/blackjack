@@ -9,6 +9,8 @@
 #include <QCursor>
 #include <string>
 
+#include "Sound.h"
+
 #define CHIP_DIAMETER 70
 #define CHIP_HOVER_DIAMETER (CHIP_DIAMETER * 1.25)
 

@@ -11,6 +11,7 @@ public:
     Sound();
     static void playClick();
     static void playChip();
+    static void playCardDeal();
 
 private:
     std::unique_ptr<QMediaPlayer> _player;

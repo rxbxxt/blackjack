@@ -22,3 +22,8 @@ void Sound::playChip() {
     _instance->_player->setSource(QUrl("qrc:/sound/chip"));
     _instance->_player->play();
 }
+
+void Sound::playCardDeal() {
+    _instance->_player->setSource(QUrl("qrc:/sound/card"));
+    _instance->_player->play();
+}

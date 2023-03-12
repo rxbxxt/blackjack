@@ -4,17 +4,18 @@
 #include <QPixmap>
 #include <vector>
 
-class Player {
+#include "BlackjackPlayer.h"
+
+class Player : public BlackjackPlayer {
 public:
     Player();
+    ~Player() override {}
 
-    const int &getBalance() const { return _balance; }
-    void setBalance(int balance) { _balance = balance; }
+    int getBalance();
+    void setBalance(int balance);
 
 private:
     int _balance;
-    int _hand_score;
-    std::vector <QPixmap*> _hand;
 };
 
 #endif // PLAYER_H

@@ -17,7 +17,7 @@ class Chip : public QObject,
     Q_OBJECT
 
 signals:
-    void clicked();
+    void clicked(bool add);
 
 public:
     Chip(int value, QGraphicsItem *parent = nullptr);

@@ -64,4 +64,10 @@
     <!-- unknown -->
     <file alias="unknown">./images/cards/unknown.png</file>
   </qresource>
+
+  <qresource prefix="/sound">
+    <file alias="card">./sound/card.mp3</file>
+    <file alias="chip">./sound/chip.mp3</file>
+    <file alias="click">./sound/click.wav</file>
+  </qresource>
 </RCC>

@@ -13,7 +13,7 @@ set(CMAKE_AUTORCC ON)
 # PATH = ${PATH};${QTDIR}\lib;${QTDIR}\bin
 set(CMAKE_PREFIX_PATH $ENV{QTDIR})
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
 qt_standard_project_setup()
 
 set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
@@ -44,4 +44,5 @@ target_link_libraries(blackjack PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
+    Qt6::Multimedia
 )

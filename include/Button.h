@@ -8,6 +8,8 @@
 #include <QBrush>
 #include <QCursor>
 
+#include "Sound.h"
+
 #define BUTTON_WIDTH  200
 #define BUTTON_HEIGHT 50
 

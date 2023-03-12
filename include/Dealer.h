@@ -3,6 +3,7 @@
 
 #include <QPixmap>
 #include <vector>
+#include <ranges>
 #include <cstdint>
 #include <sstream>
 #include <random>
@@ -22,17 +23,17 @@ public:
 
     const std::pair<QPixmap*, uint8_t> &getCard();
 
+    const std::pair<QPixmap*, uint8_t> &getUnknownCard() const {
+        return _cards_to_values.front();
+    }
+
 private:
     std::vector <std::pair <QPixmap*, uint8_t>>  _cards_to_values;
-    std::vector <std::pair<QPixmap*, uint8_t>>   _deck;
+    std::vector <std::pair <QPixmap*, uint8_t>>  _deck;
 
     void loadDeck();
     void loadCards();
     void loadCardsHelper(const char *cardfile, int cardnum);
-
-    const std::pair<QPixmap*, uint8_t> &getUnknownCard() const { 
-        return _cards_to_values.front(); 
-    }
 };
 
 #endif // DEALER_H

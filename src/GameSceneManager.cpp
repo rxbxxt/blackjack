@@ -8,26 +8,24 @@ GameSceneManager::~GameSceneManager() {
     delete _balance_text;
     delete _playerscore_text;
     delete _dealerscore_text;
+    delete _gameresult_text;
 }
 
 void GameSceneManager::clearDealScene() {
-    removeDealItems();
+    _scene->removeItem(_deal_text);
     _scene->removeItem(_balance_text);
+    _scene->removeItem(_playerscore_text);
+    _scene->removeItem(_dealerscore_text);
     delete _deal_text;
     delete _balance_text;
     delete _playerscore_text;
     delete _dealerscore_text;
+    delete _gameresult_text;
     _deal_text = nullptr;
     _balance_text = nullptr;
     _playerscore_text = nullptr;
     _dealerscore_text = nullptr;
-}
-
-void GameSceneManager::removeDealItems() {
-    _scene->removeItem(_button_deal.get());
-    for (auto &chip : _chips) {
-        _scene->removeItem(chip);
-    }
+    _gameresult_text = nullptr;
 }
 
 void GameSceneManager::deal() { 
@@ -37,10 +35,10 @@ void GameSceneManager::deal() {
     for (auto &chip : _chips) {
         _scene->removeItem(chip);
     }
+
     _deal_text->setPos(BETTED_TEXT_X, BETTED_TEXT_Y);
     _player->setBalance(_player->getBalance() - _bet_sum);
     addPlayerBalance();
-    removeDealItems();
     initHitStandScene();
 }
 
@@ -65,26 +63,27 @@ GameSceneManager::GameSceneManager(QGraphicsScene *scene,
     _balance_text     = nullptr;
     _playerscore_text = nullptr;
     _dealerscore_text = nullptr;
+    _gameresult_text  = nullptr;
     _resolution_x     = resolution_x;
     _resolution_y     = resolution_y;
     _dealer           = std::make_unique<Dealer>();
     _player           = std::make_unique<Player>();
     _font             = std::make_unique<QFont>();
 
+    _pixmap_items.reserve(15);
     _chips.reserve(6);
     _font->setPointSize(FONT_SIZE);
-    initDealSceneButtons();
-    initHitStandSceneButtons();
-    initDealSceneChips();
 }
 
 void GameSceneManager::start() {
-    _bet_sum = 0;
+    initDealSceneButtons();
+    initDealSceneChips();
     addDealSceneItems();
     addPlayerBalance(); 
 }
 
 void GameSceneManager::addDealSceneItems() {
+    _bet_sum = 0;
     _scene->addItem(_button_deal.get());
     for (auto &chip : _chips) {
         _scene->addItem(chip);
@@ -97,6 +96,7 @@ void GameSceneManager::initDealSceneButtons() {
 }
 
 void GameSceneManager::initDealSceneChips() {
+    _chips.clear();
     int x = 0;
     for (int chip_value : {1, 5, 25, 50, 100, 500}) {
         auto chip = new Chip(chip_value);
@@ -112,8 +112,8 @@ void GameSceneManager::initDealSceneChips() {
 }
 
 void GameSceneManager::initButton(QPointer<Button> &button,
-                    const char *button_text,
-                    int button_y, int button_x) {
+                                  const char *button_text,
+                                  int button_y, int button_x) {
     button = new Button(button_text);
     if (button_x == -1) {
         button_x = _resolution_x / 2.0f - button->boundingRect().width() / 2.0f;
@@ -124,7 +124,8 @@ void GameSceneManager::initButton(QPointer<Button> &button,
 void GameSceneManager::addPlayerBalance() {
     std::stringstream balance_text;
     balance_text << "Balance: $" << _player->getBalance();
-    setMessage(&_balance_text, balance_text.str().c_str(), BALANCE_TEXT_X, BALANCE_TEXT_Y);
+    setMessage(&_balance_text, balance_text.str().c_str(),
+        BALANCE_TEXT_X, BALANCE_TEXT_Y);
 }
 
 void GameSceneManager::setMessage(QGraphicsTextItem **textitem,
@@ -142,26 +143,54 @@ void GameSceneManager::setMessage(QGraphicsTextItem **textitem,
 }
 
 void GameSceneManager::initHitStandScene() {
-    for (int i = 0; i < 2; ++i) {
-        dealCards();
+    _player->reset();
+    _dealer->reset();
+
+    initHitStandSceneButtons();
+
+    int cards = 2;
+    while (cards--) {
+        updateBlackjackPlayer(*_player);
+        updateBlackjackPlayer(*_dealer);
     }
     addHitStandSceneItems();
+    calculateResults();
 }
 
-void GameSceneManager::dealCards() {
-    auto playerpair = _dealer->getCard();
-    dealCard(playerpair, *_player, PLAYERCARD_Y);
+void GameSceneManager::updateBlackjackPlayer(BlackjackPlayer &blackjack_player) {
+    auto card_to_value = _dealer->getCard();
+    dealCard(card_to_value, blackjack_player,
+        &blackjack_player == _player.get() ? PLAYERCARD_Y : DEALERCARD_Y);
+    updateScoreMessage(blackjack_player);
+}
 
-    auto dealerpair = _dealer->getCard();
-    dealCard(dealerpair, *_dealer, DEALERCARD_Y);
+void GameSceneManager::updateScoreMessage(BlackjackPlayer &blackjack_player) {
+    const char *msg;
+    int score_y;
+    int score;
+    QGraphicsTextItem **text;
+
+    bool is_player = &blackjack_player == _player.get();
+
+    if (is_player) {
+        msg = "Your score: ";
+        score_y = PLAYER_SCORE_Y;
+        text = &_playerscore_text;
+        score = blackjack_player.getHandScore();
+    }
+    else {
+        msg = "Dealer score: ";
+        score_y = DEALER_SCORE_Y;
+        text = &_dealerscore_text;
+        score = blackjack_player.standing()
+              ? blackjack_player.getHandScore()
+              : blackjack_player.getHandScore()   // hide first card score
+                   - blackjack_player.getHandCards().front().second;
+    }
 
     std::stringstream score_text;
-    score_text << "Your score: " << _player->getHandScore();
-    setMessage(&_playerscore_text, score_text.str().c_str(), SCORE_X, PLAYER_SCORE_Y);
-
-    score_text.str("");
-    score_text << "Dealer score: " << _dealer->getHandScore();
-    setMessage(&_dealerscore_text, score_text.str().c_str(), SCORE_X, DEALER_SCORE_Y);
+    score_text << msg << score;
+    setMessage(text, score_text.str().c_str(), SCORE_X, score_y);
 }
 
 void GameSceneManager::dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
@@ -170,14 +199,35 @@ void GameSceneManager::dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
     auto card = card_to_value.first;
     auto cardvalue = card_to_value.second;
     auto cards_count = blackjack_player.getHandCardsCount();
-    drawCard(card, CARD_X + (cards_count * card->width() / 2), card_position_y);
-    blackjack_player.setHandScore(blackjack_player.getHandScore() + cardvalue);
-    blackjack_player.setHandCardsCount(cards_count + 1);
+
+    if (&blackjack_player == _dealer.get() && cards_count == 0) {
+        card = _dealer->getUnknownCard().first;
+    }
+    _pixmap_items.push_back(_scene->addPixmap(*card));
+
+
+    animateCard(card, CARD_X + (cards_count * card->width() / 2), card_position_y);
+    blackjack_player.dealCard(card_to_value);
 }
 
-void GameSceneManager::drawCard(QPixmap *card, int x, int y) {
-    auto card_item = _scene->addPixmap(*card); 
-    card_item->setPos(x, y);
+void GameSceneManager::animateCard(QPixmap *card, int x, int y) {
+    QPointF start_position(-200, -200);
+    QPointF final_position(x, y);
+
+    auto animation = new QGraphicsItemAnimation();
+    animation->setItem(_pixmap_items.back());
+
+    auto timeline = new QTimeLine(500);
+    animation->setTimeLine(timeline);
+
+    animation->setPosAt(0, start_position);
+    animation->setPosAt(1, final_position);
+
+    connect(timeline, &QTimeLine::finished, animation, &QObject::deleteLater);
+    connect(timeline, &QTimeLine::finished, timeline, &QObject::deleteLater);
+
+    timeline->start();
+    Sound::playCardDeal();
 }
 
 void GameSceneManager::initHitStandSceneButtons() {
@@ -193,7 +243,99 @@ void GameSceneManager::addHitStandSceneItems() {
 }
 
 void GameSceneManager::stand() {
+    _player->stand();
+
+    while (_dealer->getHandScore() < 16)
+        updateBlackjackPlayer(*_dealer);
+
+    _dealer->stand();
+
+    auto redraw_cards = [&]() {
+        int card_index = 0;
+        for (auto &card : _dealer->getHandCards()) {
+            auto item = _scene->addPixmap(*card.first);
+            item->setPos(
+                CARD_X + (card_index * card.first->width() / 2),
+                DEALERCARD_Y);
+
+            _pixmap_items.push_back(item);
+            ++card_index;
+        }
+    };
+
+    redraw_cards();
+    updateScoreMessage(*_dealer);
+
+    calculateResults();
 }
 
 void GameSceneManager::hit() {
+    updateBlackjackPlayer(*_player);
+    calculateResults();
+}
+
+void GameSceneManager::calculateResults() {
+    int player_score = _player->getHandScore();
+    int dealer_score = _dealer->getHandScore();
+
+    if (dealer_score >= 16 || player_score > 21)
+        _dealer->stand();
+
+    if (player_score >= 21 || dealer_score > 21)
+        _player->stand();
+
+    if (!(_player->standing() && _dealer->standing()))
+        return; // continue play
+
+    compareScores();
+}
+
+void GameSceneManager::compareScores() {
+    int player_score = _player->getHandScore();
+    int dealer_score = _dealer->getHandScore();
+
+    if (player_score == dealer_score)
+        draw();
+    else if (((player_score > dealer_score) || (dealer_score > 21))
+                        && (player_score <= 21))
+        playerWin();
+    else
+        playerLose();
+
+    auto timer = new QTimer;
+    connect(timer, &QTimer::timeout, this, &GameSceneManager::newRound);
+    connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+    timer->start(2000); // wait 2 sec and then start new round
+}
+
+void GameSceneManager::draw() {
+    setMessage(&_gameresult_text, "DRAW", GAMERESULT_X, GAMERESULT_Y);
+    _player->setBalance(_player->getBalance() + _bet_sum);
+}
+
+void GameSceneManager::playerWin() {
+    _player->setBalance(_player->getBalance() + _bet_sum * 2);
+    setMessage(&_gameresult_text, "WIN", GAMERESULT_X, GAMERESULT_Y);
+    _gameresult_text->setDefaultTextColor(Qt::green);
+}
+
+void GameSceneManager::playerLose() {
+    setMessage(&_gameresult_text, "LOSE", GAMERESULT_X, GAMERESULT_Y);
+    _gameresult_text->setDefaultTextColor(Qt::red);
+}
+
+void GameSceneManager::newRound() {
+    __newRound();
+}
+
+void GameSceneManager::__newRound() {
+    for (auto &pixmap : _pixmap_items)
+        _scene->removeItem(pixmap);
+    _pixmap_items.clear();
+    _scene->removeItem(_button_hit);
+    _scene->removeItem(_button_stand);
+    clearDealScene();
+
+    addPlayerBalance();
+    addDealSceneItems();
 }

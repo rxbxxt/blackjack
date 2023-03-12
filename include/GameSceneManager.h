@@ -3,6 +3,10 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsItemAnimation>
+#include <QPropertyAnimation>
+#include <QTimeLine>
+#include <QTimer>
 #include <QPointer>
 #include <QPainter>
 #include <QPixmap>
@@ -16,6 +20,7 @@
 #include "Player.h"
 #include "Button.h"
 #include "Chip.h"
+#include "Sound.h"
 
 #define FIRST_CHIP_X       350
 #define CHIPS_HEIGHT       200
@@ -35,6 +40,8 @@
 #define BUTTON_HIT_Y       325
 #define BUTTON_STAND_Y     250
 #define BUTTON_STAND_HIT_X 75
+#define GAMERESULT_X       600
+#define GAMERESULT_Y       325
 
 class GameSceneManager : public QObject {
     Q_OBJECT
@@ -63,9 +70,10 @@ private:
     QGraphicsTextItem       *_balance_text;
     QGraphicsTextItem       *_playerscore_text;
     QGraphicsTextItem       *_dealerscore_text;
+    QGraphicsTextItem       *_gameresult_text;
 
+    std::vector <QGraphicsPixmapItem*> _pixmap_items;
 
-    void removeDealItems();
     void addPlayerBalance();
     void addDealSceneItems();
     void initDealSceneButtons();
@@ -83,18 +91,30 @@ private:
                     const char *textmessage,
                     int x, int y);
 
-    void dealCards();
     void dealCard(std::pair<QPixmap*, uint8_t> &card_to_value,
                   BlackjackPlayer &blackjack_player,
                   int card_position_y);
 
-    void drawCard(QPixmap *card, int x, int y);
+    void animateCard(QPixmap *card, int x, int y);
+
+    void updateScoreMessage(BlackjackPlayer &blackjack_player);
+    void updateBlackjackPlayer(BlackjackPlayer &blackjack_player);
+
+    void calculateResults();
+    void compareScores();
+
+    void draw();
+    void playerWin();
+    void playerLose();
+
+    void __newRound();
 
 private slots:
     void deal();
     void bet(int sum);
     void stand();
     void hit();
+    void newRound();
 };
 
 #endif // GAMEMANAGER_H

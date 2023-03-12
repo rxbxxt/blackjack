@@ -1,24 +1,30 @@
 #ifndef BLACKJACKPLAYER_H 
 #define BLACKJACKPLAYER_H 
 
+#include <QPixmap>
+#include <vector>
+
 class BlackjackPlayer {
 public:
-    BlackjackPlayer() { 
-        _card_count = 0;
-        _hand_score = 0;
-    }
+    virtual ~BlackjackPlayer() = default;
+    BlackjackPlayer();
+
+    void reset();
+    void dealCard(std::pair<QPixmap*, uint8_t> &card_to_value);
 
     int getHandScore()      { return _hand_score; }
-    int getHandCardsCount() { return _card_count; }
+    int getHandCardsCount() { return _hand.size(); }
 
-    void setHandScore(int score)    { _hand_score = score; }
-    void setHandCardsCount(int num) { _card_count = num;   }
+    auto &getHandCards() { return _hand; }
 
-    virtual ~BlackjackPlayer() = default;
+    bool standing() { return _stand; }
+    void stand()    { _stand = true; }
 
 private:
-    int _card_count;
+    bool _stand;
     int _hand_score;
+
+    std::vector <std::pair<QPixmap*, uint8_t>> _hand;
 };
 
 #endif // BLACKJACKPLAYER_H 

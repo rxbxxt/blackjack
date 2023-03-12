@@ -42,12 +42,14 @@ void GameSceneManager::deal() {
     initHitStandScene();
 }
 
-void GameSceneManager::bet(int sum) { 
+void GameSceneManager::bet(int sum, bool add) {
     int player_balance = _player->getBalance();
     
-    if (player_balance < _bet_sum + sum) return;
+    if (add && player_balance < _bet_sum + sum) return;
+    if (!add && _bet_sum < sum) return;
 
-    _bet_sum += sum; 
+    _bet_sum += (add ? sum : -sum);
+    Sound::playChip();
 
     std::stringstream deal_text;
     deal_text << "Your bet: $" << _bet_sum;
@@ -103,8 +105,8 @@ void GameSceneManager::initDealSceneChips() {
         chip->setPos(FIRST_CHIP_X + x * CHIP_HOVER_DIAMETER, CHIPS_HEIGHT);
         _chips.push_back(chip);
 
-        connect(_chips.back(), &Chip::clicked, this, [=](){
-            emit bet(chip_value);
+        connect(_chips.back(), &Chip::clicked, this, [=](bool add){
+            emit bet(chip_value, add);
         });
 
         ++x;

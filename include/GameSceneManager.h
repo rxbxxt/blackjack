@@ -111,7 +111,7 @@ private:
 
 private slots:
     void deal();
-    void bet(int sum);
+    void bet(int sum, bool add);
     void stand();
     void hit();
     void newRound();

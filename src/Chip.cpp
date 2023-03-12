@@ -46,8 +46,12 @@ void Chip::initText() {
 
 void Chip::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     setCursor(QCursor(Qt::ArrowCursor));
-    Sound::playChip();
-    emit clicked();
+
+    if (event->button() == Qt::LeftButton) {
+        emit clicked(true);
+    } else if (event->button() == Qt::RightButton) {
+        emit clicked(false);
+    }
 }
 
 void Chip::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {

@@ -9,8 +9,6 @@
 #include <QCursor>
 #include <string>
 
-#include "Sound.h"
-
 #define CHIP_DIAMETER 70
 #define CHIP_HOVER_DIAMETER (CHIP_DIAMETER * 1.25)
 
@@ -19,7 +17,7 @@ class Chip : public QObject,
     Q_OBJECT
 
 signals:
-    void clicked();
+    void clicked(bool add);
 
 public:
     Chip(int value, QGraphicsItem *parent = nullptr);

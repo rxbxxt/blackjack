@@ -33,7 +33,9 @@ void GameSceneManager::deal() {
 
     _scene->removeItem(_button_deal.get());
     for (auto &chip : _chips) {
-        _scene->removeItem(chip);
+        if (_scene->items().contains(chip)) {
+            _scene->removeItem(chip);
+        }
     }
 
     _deal_text->setPos(BETTED_TEXT_X, BETTED_TEXT_Y);
@@ -313,6 +315,7 @@ void GameSceneManager::compareScores() {
 void GameSceneManager::draw() {
     setMessage(&_gameresult_text, "DRAW", GAMERESULT_X, GAMERESULT_Y);
     _player->setBalance(_player->getBalance() + _bet_sum);
+    _gameresult_text->setDefaultTextColor(Qt::yellow);
 }
 
 void GameSceneManager::playerWin() {
@@ -331,8 +334,11 @@ void GameSceneManager::newRound() {
 }
 
 void GameSceneManager::__newRound() {
-    for (auto &pixmap : _pixmap_items)
-        _scene->removeItem(pixmap);
+    for (auto &pixmap : _pixmap_items) {
+        if (_scene->items().contains(pixmap)) {
+            _scene->removeItem(pixmap);
+        }
+    }
     _pixmap_items.clear();
     _scene->removeItem(_button_hit);
     _scene->removeItem(_button_stand);

@@ -9,6 +9,7 @@ GameSceneManager::~GameSceneManager() {
     delete _playerscore_text;
     delete _dealerscore_text;
     delete _gameresult_text;
+    delete _timer;
 }
 
 void GameSceneManager::clearDealScene() {
@@ -21,11 +22,13 @@ void GameSceneManager::clearDealScene() {
     delete _playerscore_text;
     delete _dealerscore_text;
     delete _gameresult_text;
+    delete _timer;
     _deal_text = nullptr;
     _balance_text = nullptr;
     _playerscore_text = nullptr;
     _dealerscore_text = nullptr;
     _gameresult_text = nullptr;
+    _timer = nullptr;
 }
 
 void GameSceneManager::deal() { 
@@ -68,6 +71,7 @@ GameSceneManager::GameSceneManager(QGraphicsScene *scene,
     _playerscore_text = nullptr;
     _dealerscore_text = nullptr;
     _gameresult_text  = nullptr;
+    _timer            = nullptr;
     _resolution_x     = resolution_x;
     _resolution_y     = resolution_y;
     _dealer           = std::make_unique<Dealer>();
@@ -306,10 +310,12 @@ void GameSceneManager::compareScores() {
     else
         playerLose();
 
-    auto timer = new QTimer;
-    connect(timer, &QTimer::timeout, this, &GameSceneManager::newRound);
-    connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
-    timer->start(2000); // wait 2 sec and then start new round
+    _timer = new QTimer;
+    connect(_timer, &QTimer::timeout, this, &GameSceneManager::newRound);
+    _timer->start(2000); // wait 2 sec and then start new round
+
+    _scene->removeItem(_button_hit);
+    _scene->removeItem(_button_stand);
 }
 
 void GameSceneManager::draw() {
@@ -340,8 +346,6 @@ void GameSceneManager::__newRound() {
         }
     }
     _pixmap_items.clear();
-    _scene->removeItem(_button_hit);
-    _scene->removeItem(_button_stand);
     clearDealScene();
 
     addPlayerBalance();

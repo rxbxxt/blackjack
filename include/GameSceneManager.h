@@ -71,6 +71,8 @@ private:
     QGraphicsTextItem       *_playerscore_text;
     QGraphicsTextItem       *_dealerscore_text;
     QGraphicsTextItem       *_gameresult_text;
+    QTimer                  *_timer;
+
 
     std::vector <QGraphicsPixmapItem*> _pixmap_items;
 

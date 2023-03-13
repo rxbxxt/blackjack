@@ -3,8 +3,6 @@
 
 #include <QPixmap>
 #include <vector>
-#include <ranges>
-#include <cstdint>
 #include <sstream>
 #include <random>
 #include <algorithm>
